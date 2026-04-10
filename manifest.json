@@ -1,0 +1,21 @@
+{
+  "name": "Life OS 🐱",
+  "short_name": "Life OS",
+  "description": "Your personal pixie forest life dashboard with Sakura the cat assistant",
+  "start_url": "/lifeos/",
+  "scope": "/lifeos/",
+  "display": "standalone",
+  "background_color": "#fff5f9",
+  "theme_color": "#fce4ec",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["productivity", "lifestyle", "health"],
+  "lang": "en"
+}
