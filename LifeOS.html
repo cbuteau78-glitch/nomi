@@ -1,0 +1,2290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="theme-color" content="#0f172a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Life OS">
+<title>Life OS</title>
+<link rel="manifest" href="manifest.json">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0a0f1e;
+  --surface: #111827;
+  --surface2: #1a2234;
+  --surface3: #243044;
+  --border: rgba(255,255,255,0.07);
+  --border2: rgba(255,255,255,0.12);
+  --text: #f0f4ff;
+  --text2: #8899bb;
+  --text3: #4a5a7a;
+  --blue: #3b82f6;
+  --blue-dim: rgba(59,130,246,0.15);
+  --purple: #8b5cf6;
+  --purple-dim: rgba(139,92,246,0.15);
+  --green: #10b981;
+  --green-dim: rgba(16,185,129,0.15);
+  --amber: #f59e0b;
+  --amber-dim: rgba(245,158,11,0.15);
+  --red: #ef4444;
+  --red-dim: rgba(239,68,68,0.12);
+  --teal: #14b8a6;
+  --pink: #ec4899;
+  --font-display: 'DM Serif Display', serif;
+  --font-body: 'DM Sans', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+  --radius: 16px;
+  --radius-sm: 10px;
+  --nav-h: 64px;
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+html, body {
+  height: 100%;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.6;
+  overflow: hidden;
+}
+
+/* SCROLLBAR */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 4px; }
+
+/* APP SHELL */
+#app {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+  position: relative;
+}
+
+/* HEADER */
+.header {
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+  border-bottom: 1px solid var(--border);
+  background: rgba(10,15,30,0.95);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  flex-shrink: 0;
+  z-index: 10;
+}
+.header-logo {
+  font-family: var(--font-display);
+  font-size: 20px;
+  color: var(--text);
+  letter-spacing: -0.5px;
+}
+.header-logo span { color: var(--blue); }
+.header-date {
+  font-size: 12px;
+  color: var(--text3);
+  font-family: var(--font-mono);
+}
+
+/* MAIN CONTENT */
+.main {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: calc(var(--nav-h) + var(--safe-bottom) + 16px);
+}
+
+/* BOTTOM NAV */
+.nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: calc(var(--nav-h) + var(--safe-bottom));
+  padding-bottom: var(--safe-bottom);
+  background: rgba(10,15,30,0.97);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-top: 1px solid var(--border);
+  display: flex;
+  align-items: flex-start;
+  padding-top: 8px;
+  z-index: 100;
+}
+.nav-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  padding: 4px 0;
+  transition: all 0.2s;
+  -webkit-user-select: none;
+  user-select: none;
+}
+.nav-icon { font-size: 22px; transition: transform 0.2s; }
+.nav-label { font-size: 10px; color: var(--text3); font-weight: 500; letter-spacing: 0.3px; transition: color 0.2s; }
+.nav-item.active .nav-label { color: var(--blue); }
+.nav-item.active .nav-icon { transform: translateY(-2px); }
+
+/* SCREENS */
+.screen { display: none; animation: fadeUp 0.3s ease; }
+.screen.active { display: block; }
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* SECTION PADDING */
+.section { padding: 20px; }
+.section + .section { padding-top: 0; }
+
+/* CARDS */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px;
+  margin-bottom: 12px;
+}
+.card-sm {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 14px;
+  margin-bottom: 10px;
+}
+
+/* LABELS */
+.label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--text3);
+  margin-bottom: 12px;
+}
+.section-title {
+  font-family: var(--font-display);
+  font-size: 26px;
+  color: var(--text);
+  margin-bottom: 4px;
+}
+.section-sub {
+  font-size: 13px;
+  color: var(--text2);
+  margin-bottom: 20px;
+}
+
+/* PILLS / BADGES */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 600;
+}
+.badge-blue { background: var(--blue-dim); color: var(--blue); }
+.badge-green { background: var(--green-dim); color: var(--green); }
+.badge-amber { background: var(--amber-dim); color: var(--amber); }
+.badge-purple { background: var(--purple-dim); color: var(--purple); }
+.badge-red { background: var(--red-dim); color: var(--red); }
+
+/* BUTTONS */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 20px;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s;
+  -webkit-user-select: none;
+  user-select: none;
+}
+.btn-primary { background: var(--blue); color: white; }
+.btn-primary:active { background: #2563eb; transform: scale(0.98); }
+.btn-ghost { background: transparent; color: var(--text2); border: 1px solid var(--border2); }
+.btn-ghost:active { background: var(--surface2); }
+.btn-full { width: 100%; }
+.btn-sm { padding: 8px 14px; font-size: 13px; }
+
+/* INPUT */
+.input {
+  width: 100%;
+  background: var(--surface2);
+  border: 1px solid var(--border2);
+  border-radius: var(--radius-sm);
+  padding: 12px 16px;
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 14px;
+  outline: none;
+  transition: border 0.2s;
+}
+.input:focus { border-color: var(--blue); }
+.input::placeholder { color: var(--text3); }
+textarea.input { resize: none; min-height: 80px; }
+
+/* PROGRESS BAR */
+.progress-bar {
+  height: 6px;
+  background: var(--surface3);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.progress-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.5s ease;
+}
+
+/* TOGGLE/CHECKBOX */
+.toggle-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+}
+.toggle-row:last-child { border-bottom: none; }
+.toggle-label { font-size: 14px; color: var(--text); }
+.toggle-sub { font-size: 12px; color: var(--text3); margin-top: 2px; }
+.checkbox {
+  width: 44px;
+  height: 44px;
+  border-radius: 8px;
+  border: 2px solid var(--border2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.2s;
+  font-size: 16px;
+  cursor: pointer;
+}
+.checkbox.checked { background: var(--green); border-color: var(--green); }
+
+/* DIVIDER */
+.divider { height: 1px; background: var(--border); margin: 16px 0; }
+
+/* CHIP ROW */
+.chip-row { display: flex; gap: 8px; flex-wrap: wrap; }
+.chip {
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 500;
+  border: 1px solid var(--border2);
+  color: var(--text2);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.chip.active { background: var(--blue-dim); border-color: var(--blue); color: var(--blue); }
+
+/* GRID */
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+
+/* STAT CARD */
+.stat-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 14px;
+  text-align: center;
+}
+.stat-value { font-family: var(--font-display); font-size: 28px; color: var(--text); }
+.stat-label { font-size: 11px; color: var(--text3); margin-top: 2px; }
+
+/* TIMELINE BLOCK */
+.time-block {
+  display: flex;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+  align-items: flex-start;
+}
+.time-block:last-child { border-bottom: none; }
+.time-block-time {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text3);
+  min-width: 72px;
+  padding-top: 2px;
+}
+.time-block-content { flex: 1; }
+.time-block-title { font-size: 14px; color: var(--text); font-weight: 500; }
+.time-block-note { font-size: 12px; color: var(--text3); margin-top: 2px; }
+.time-block-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-top: 5px;
+  flex-shrink: 0;
+}
+
+/* CHAT */
+.chat-container {
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 56px - var(--nav-h) - var(--safe-bottom));
+  height: calc(100dvh - 56px - var(--nav-h) - var(--safe-bottom));
+}
+.chat-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  -webkit-overflow-scrolling: touch;
+}
+.msg {
+  max-width: 85%;
+  padding: 12px 16px;
+  border-radius: 16px;
+  font-size: 14px;
+  line-height: 1.5;
+  animation: msgIn 0.25s ease;
+}
+@keyframes msgIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.msg-user {
+  align-self: flex-end;
+  background: var(--blue);
+  color: white;
+  border-bottom-right-radius: 4px;
+}
+.msg-ai {
+  align-self: flex-start;
+  background: var(--surface2);
+  color: var(--text);
+  border-bottom-left-radius: 4px;
+  border: 1px solid var(--border);
+}
+.msg-ai strong { color: var(--blue); }
+.chat-input-area {
+  padding: 12px 16px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  gap: 10px;
+  align-items: flex-end;
+  background: var(--bg);
+}
+.chat-input-area textarea {
+  flex: 1;
+  min-height: 44px;
+  max-height: 120px;
+}
+.chat-send-btn {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: var(--blue);
+  border: none;
+  color: white;
+  font-size: 18px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.2s;
+}
+.chat-send-btn:active { transform: scale(0.95); background: #2563eb; }
+.typing-indicator {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+  padding: 12px 16px;
+}
+.typing-dot {
+  width: 6px; height: 6px;
+  background: var(--text3);
+  border-radius: 50%;
+  animation: typingBounce 1.2s infinite;
+}
+.typing-dot:nth-child(2) { animation-delay: 0.2s; }
+.typing-dot:nth-child(3) { animation-delay: 0.4s; }
+@keyframes typingBounce {
+  0%, 60%, 100% { transform: translateY(0); }
+  30% { transform: translateY(-6px); }
+}
+
+/* SWIPE CARD */
+.swipe-stack {
+  position: relative;
+  height: 420px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.swipe-card {
+  position: absolute;
+  width: 100%;
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  border-radius: 20px;
+  overflow: hidden;
+  cursor: grab;
+  transition: transform 0.1s;
+  touch-action: none;
+  user-select: none;
+}
+.swipe-card.dragging { cursor: grabbing; transition: none; }
+.swipe-card-img {
+  height: 180px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 80px;
+  background: var(--surface2);
+}
+.swipe-card-body { padding: 16px; }
+.swipe-card-title { font-family: var(--font-display); font-size: 22px; margin-bottom: 6px; }
+.swipe-card-meta { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
+.swipe-card-macros {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-top: 12px;
+}
+.macro-item { text-align: center; }
+.macro-val { font-weight: 600; font-size: 15px; }
+.macro-lbl { font-size: 10px; color: var(--text3); }
+.swipe-actions {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 16px;
+}
+.swipe-btn {
+  width: 56px; height: 56px;
+  border-radius: 50%;
+  border: 2px solid;
+  background: transparent;
+  font-size: 22px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+.swipe-btn:active { transform: scale(0.9); }
+.swipe-btn-skip { border-color: var(--red); color: var(--red); }
+.swipe-btn-skip:active { background: var(--red-dim); }
+.swipe-btn-save { border-color: var(--amber); color: var(--amber); }
+.swipe-btn-add { border-color: var(--green); color: var(--green); }
+.swipe-btn-add:active { background: var(--green-dim); }
+.swipe-btn-love { border-color: var(--purple); color: var(--purple); }
+
+/* OUTFIT CARD */
+.outfit-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+  text-align: center;
+}
+.outfit-display {
+  font-size: 64px;
+  margin: 16px 0;
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+}
+.outfit-items { display: flex; flex-direction: column; gap: 8px; }
+.outfit-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--surface2);
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+  text-align: left;
+}
+.outfit-item-emoji { font-size: 24px; }
+.outfit-item-name { font-size: 14px; font-weight: 500; }
+.outfit-item-type { font-size: 12px; color: var(--text3); }
+
+/* REVIEW CARD */
+.review-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px;
+  margin-bottom: 10px;
+}
+.review-card-header { display: flex; gap: 12px; align-items: flex-start; margin-bottom: 10px; }
+.review-card-emoji { font-size: 36px; flex-shrink: 0; }
+.review-card-title { font-weight: 600; font-size: 15px; }
+.review-card-sub { font-size: 12px; color: var(--text3); margin-top: 2px; }
+.review-card-preview { font-size: 13px; color: var(--text2); margin-bottom: 10px; line-height: 1.5; }
+.review-card-links { display: flex; gap: 8px; flex-wrap: wrap; }
+.review-link {
+  font-size: 12px;
+  font-weight: 500;
+  padding: 5px 12px;
+  border-radius: 20px;
+  text-decoration: none;
+  border: 1px solid var(--border2);
+  color: var(--text2);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.review-link:active { background: var(--surface2); }
+
+/* WORKOUT */
+.exercise-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+  margin-bottom: 12px;
+}
+.exercise-demo {
+  height: 160px;
+  background: var(--surface2);
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 72px;
+  margin-bottom: 16px;
+}
+.exercise-cues { list-style: none; display: flex; flex-direction: column; gap: 6px; }
+.exercise-cue {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--text2);
+}
+.cue-num {
+  width: 20px; height: 20px;
+  border-radius: 50%;
+  background: var(--blue-dim);
+  color: var(--blue);
+  font-size: 11px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.fencing-purpose {
+  background: var(--purple-dim);
+  border-left: 3px solid var(--purple);
+  border-radius: 0 8px 8px 0;
+  padding: 10px 12px;
+  font-size: 13px;
+  color: var(--purple);
+  margin-top: 12px;
+}
+
+/* HABIT TRACKER */
+.habit-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border);
+}
+.habit-row:last-child { border-bottom: none; }
+.habit-icon { font-size: 22px; width: 36px; text-align: center; }
+.habit-info { flex: 1; }
+.habit-name { font-size: 14px; font-weight: 500; }
+.habit-target { font-size: 12px; color: var(--text3); }
+.habit-check {
+  width: 44px; height: 44px;
+  border-radius: 50%;
+  border: 2px solid var(--border2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 16px;
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+.habit-check.done { background: var(--green); border-color: var(--green); }
+
+/* GOAL TRACKER */
+.milestone {
+  display: flex;
+  gap: 14px;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--border);
+}
+.milestone:last-child { border-bottom: none; }
+.milestone-icon {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  flex-shrink: 0;
+}
+.milestone-content { flex: 1; }
+.milestone-title { font-size: 14px; font-weight: 500; }
+.milestone-sub { font-size: 12px; color: var(--text3); margin-top: 2px; }
+.milestone-status { font-size: 11px; font-weight: 600; margin-top: 4px; }
+
+/* CHECKIN */
+.checkin-q { margin-bottom: 20px; }
+.checkin-q label { display: block; font-size: 14px; font-weight: 500; margin-bottom: 8px; color: var(--text); }
+.pulse-slider {
+  width: 100%;
+  -webkit-appearance: none;
+  height: 6px;
+  border-radius: 3px;
+  background: var(--surface3);
+  outline: none;
+}
+.pulse-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 20px; height: 20px;
+  border-radius: 50%;
+  background: var(--blue);
+  cursor: pointer;
+}
+
+/* BUG BUTTON */
+.bug-btn {
+  position: fixed;
+  bottom: calc(var(--nav-h) + var(--safe-bottom) + 16px);
+  right: 16px;
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  background: var(--surface2);
+  border: 1px solid var(--border2);
+  color: var(--text3);
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 50;
+  transition: all 0.2s;
+}
+.bug-btn:active { transform: scale(0.9); }
+
+/* MODAL */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.7);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  z-index: 200;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s;
+}
+.modal-overlay.open { opacity: 1; pointer-events: all; }
+.modal {
+  width: 100%;
+  max-width: 480px;
+  background: var(--surface);
+  border-radius: 20px 20px 0 0;
+  padding: 20px;
+  transform: translateY(100%);
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  max-height: 80vh;
+  overflow-y: auto;
+}
+.modal-overlay.open .modal { transform: translateY(0); }
+.modal-handle {
+  width: 36px; height: 4px;
+  border-radius: 2px;
+  background: var(--border2);
+  margin: 0 auto 20px;
+}
+.modal-title { font-family: var(--font-display); font-size: 22px; margin-bottom: 16px; }
+
+/* WEEK SCHEDULE */
+.day-tab-row {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  padding-bottom: 12px;
+  scrollbar-width: none;
+}
+.day-tab-row::-webkit-scrollbar { display: none; }
+.day-tab {
+  flex-shrink: 0;
+  padding: 8px 14px;
+  border-radius: 20px;
+  border: 1px solid var(--border2);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  color: var(--text2);
+}
+.day-tab.active {
+  background: var(--blue);
+  border-color: var(--blue);
+  color: white;
+}
+
+/* NUTRITION BAR */
+.nutrition-summary {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.nutrition-item { text-align: center; }
+.nutrition-val { font-weight: 600; font-size: 16px; }
+.nutrition-lbl { font-size: 10px; color: var(--text3); }
+.nutrition-ok { color: var(--green); }
+.nutrition-warn { color: var(--amber); }
+
+/* LOADING SPINNER */
+.spinner {
+  display: inline-block;
+  width: 18px; height: 18px;
+  border: 2px solid var(--border2);
+  border-top-color: var(--blue);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* WELCOME BANNER */
+.welcome-banner {
+  background: linear-gradient(135deg, #1a2a4a 0%, #0d1f3c 100%);
+  border: 1px solid rgba(59,130,246,0.2);
+  border-radius: var(--radius);
+  padding: 20px;
+  margin-bottom: 16px;
+  position: relative;
+  overflow: hidden;
+}
+.welcome-banner::before {
+  content: '';
+  position: absolute;
+  top: -40px; right: -40px;
+  width: 120px; height: 120px;
+  background: radial-gradient(circle, rgba(59,130,246,0.15) 0%, transparent 70%);
+}
+.welcome-greeting { font-family: var(--font-display); font-size: 24px; margin-bottom: 4px; }
+.welcome-date { font-size: 13px; color: var(--text3); margin-bottom: 14px; }
+.welcome-mvd { font-size: 13px; color: var(--text2); }
+.welcome-mvd strong { color: var(--amber); }
+
+/* SCORE RING */
+.score-ring-container { display: flex; justify-content: center; margin: 16px 0; }
+.score-ring {
+  position: relative;
+  width: 100px; height: 100px;
+}
+.score-ring svg { transform: rotate(-90deg); }
+.score-ring-val {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-size: 26px;
+}
+.score-ring-lbl { font-size: 11px; color: var(--text3); margin-top: -2px; }
+
+/* ALERT */
+.alert {
+  border-radius: var(--radius-sm);
+  padding: 12px 14px;
+  font-size: 13px;
+  margin-bottom: 12px;
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+}
+.alert-icon { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+.alert-blue { background: var(--blue-dim); border: 1px solid rgba(59,130,246,0.2); color: var(--blue); }
+.alert-amber { background: var(--amber-dim); border: 1px solid rgba(245,158,11,0.2); color: var(--amber); }
+.alert-green { background: var(--green-dim); border: 1px solid rgba(16,185,129,0.2); color: var(--green); }
+
+/* RESPONSIVE */
+@media (min-width: 480px) {
+  .main { max-width: 480px; margin: 0 auto; }
+  .nav { max-width: 480px; left: 50%; transform: translateX(-50%); }
+  .bug-btn { right: calc(50% - 240px + 16px); }
+}
+
+/* INSTALL BANNER */
+.install-banner {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+  cursor: pointer;
+}
+.install-banner-text { flex: 1; font-size: 13px; color: var(--text2); }
+.install-banner-text strong { color: var(--text); display: block; font-size: 14px; }
+
+/* PANTRY ITEM */
+.pantry-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+}
+.pantry-item:last-child { border-bottom: none; }
+.pantry-item-name { font-size: 14px; }
+.pantry-item-status {
+  font-size: 11px;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-weight: 600;
+}
+.pantry-ok { background: var(--green-dim); color: var(--green); }
+.pantry-low { background: var(--amber-dim); color: var(--amber); }
+.pantry-out { background: var(--red-dim); color: var(--red); }
+</style>
+</head>
+<body>
+<div id="app">
+  <!-- HEADER -->
+  <div class="header">
+    <div class="header-logo">Life<span>OS</span></div>
+    <div class="header-date" id="headerDate"></div>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main" id="mainContent">
+
+    <!-- DASHBOARD SCREEN -->
+    <div class="screen active" id="screen-home">
+      <div class="section">
+        <div class="welcome-banner">
+          <div class="welcome-greeting" id="greeting">Good morning 🤺</div>
+          <div class="welcome-date" id="welcomeDate"></div>
+          <div class="welcome-mvd"><strong>Today's floor:</strong> Show up to work · Complete 1 business task · Sleep by 11pm</div>
+        </div>
+
+        <!-- Quick Stats -->
+        <div class="grid-3" style="margin-bottom:16px">
+          <div class="stat-card">
+            <div class="stat-value" style="color:var(--blue)" id="businessHrs">17</div>
+            <div class="stat-label">Biz hrs/wk</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" style="color:var(--green)" id="workoutStreak">0</div>
+            <div class="stat-label">Workout streak</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" style="color:var(--amber)" id="readStreak">0</div>
+            <div class="stat-label">Read streak</div>
+          </div>
+        </div>
+
+        <!-- Daily Habits -->
+        <div class="label">TODAY'S HABITS</div>
+        <div class="card" style="padding:4px 18px">
+          <div class="habit-row">
+            <div class="habit-icon">💧</div>
+            <div class="habit-info">
+              <div class="habit-name">Water</div>
+              <div class="habit-target">1 gallon · <span id="waterCount">0</span>/4 bottles</div>
+            </div>
+            <div class="habit-check" id="waterBtn" onclick="toggleWater()"></div>
+          </div>
+          <div class="habit-row">
+            <div class="habit-icon">📚</div>
+            <div class="habit-info">
+              <div class="habit-name">Reading</div>
+              <div class="habit-target">10 pages · Project Hail Mary</div>
+            </div>
+            <div class="habit-check" id="readBtn" onclick="toggleHabit('read')"></div>
+          </div>
+          <div class="habit-row">
+            <div class="habit-icon">☀️</div>
+            <div class="habit-info">
+              <div class="habit-name">Morning sunlight</div>
+              <div class="habit-target">5–10 min outdoors</div>
+            </div>
+            <div class="habit-check" id="sunBtn" onclick="toggleHabit('sun')"></div>
+          </div>
+          <div class="habit-row">
+            <div class="habit-icon">💊</div>
+            <div class="habit-info">
+              <div class="habit-name">Medication</div>
+              <div class="habit-target">Book appointment this week</div>
+            </div>
+            <div class="habit-check" id="medBtn" onclick="toggleHabit('med')"></div>
+          </div>
+          <div class="habit-row" style="border:none">
+            <div class="habit-icon">😴</div>
+            <div class="habit-info">
+              <div class="habit-name">CPAP + Sleep by 11pm</div>
+              <div class="habit-target">8+ hours protected</div>
+            </div>
+            <div class="habit-check" id="sleepBtn" onclick="toggleHabit('sleep')"></div>
+          </div>
+        </div>
+
+        <!-- Business Task -->
+        <div class="label">THIS WEEK'S BUSINESS GOAL</div>
+        <div class="card">
+          <div style="font-size:13px;color:var(--text3);margin-bottom:6px">Week 1 · Phase 1: Foundation</div>
+          <div style="font-size:15px;font-weight:600;margin-bottom:12px">Write 1-page concept doc + open Mercury account</div>
+          <div class="progress-bar">
+            <div class="progress-fill" style="width:0%;background:var(--blue)" id="weekProgress"></div>
+          </div>
+          <div style="font-size:12px;color:var(--text3);margin-top:6px"><span id="tasksComplete">0</span>/5 tasks complete</div>
+        </div>
+
+        <!-- Today's Schedule Preview -->
+        <div class="label">TODAY'S BLOCKS</div>
+        <div class="card" id="todaySchedule" style="padding: 8px 18px"></div>
+
+        <!-- Fencing Readiness -->
+        <div class="label">FENCING READINESS</div>
+        <div class="card" style="text-align:center;padding:20px">
+          <div class="score-ring-container">
+            <div class="score-ring">
+              <svg width="100" height="100" viewBox="0 0 100 100">
+                <circle cx="50" cy="50" r="40" fill="none" stroke="var(--surface3)" stroke-width="8"/>
+                <circle cx="50" cy="50" r="40" fill="none" stroke="var(--purple)" stroke-width="8"
+                  stroke-dasharray="251.2" stroke-dashoffset="226" stroke-linecap="round" id="fencingRing"/>
+              </svg>
+              <div class="score-ring-val">
+                <span id="fencingScore">10</span>
+                <span class="score-ring-lbl">/ 100</span>
+              </div>
+            </div>
+          </div>
+          <div style="font-size:13px;color:var(--text2)">Week 1 of 8 · Building base fitness</div>
+          <div style="font-size:12px;color:var(--text3);margin-top:4px">Fall season target: 85+</div>
+        </div>
+
+        <!-- Action Items -->
+        <div class="label">🔴 DO THIS WEEK</div>
+        <div class="card" style="padding:4px 18px">
+          <div class="toggle-row" onclick="toggleTask(this)">
+            <div>
+              <div class="toggle-label">Book medication appointment</div>
+              <div class="toggle-sub">Ask about insurance + savings programs</div>
+            </div>
+            <div class="checkbox">☐</div>
+          </div>
+          <div class="toggle-row" onclick="toggleTask(this)">
+            <div>
+              <div class="toggle-label">Open Mercury business account</div>
+              <div class="toggle-sub">Free · 10 min online at mercury.com</div>
+            </div>
+            <div class="checkbox">☐</div>
+          </div>
+          <div class="toggle-row" onclick="toggleTask(this)">
+            <div>
+              <div class="toggle-label">Check GitHub Student Developer Pack</div>
+              <div class="toggle-sub">Free dev tools you're leaving on the table</div>
+            </div>
+            <div class="checkbox">☐</div>
+          </div>
+          <div class="toggle-row" style="border:none" onclick="toggleTask(this)">
+            <div>
+              <div class="toggle-label">Define this week's 5 business tasks</div>
+              <div class="toggle-sub">Sunday planning → specific daily tasks</div>
+            </div>
+            <div class="checkbox">☐</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SCHEDULE SCREEN -->
+    <div class="screen" id="screen-schedule">
+      <div class="section">
+        <div class="section-title">Schedule</div>
+        <div class="section-sub">Your weekly time map</div>
+
+        <div class="day-tab-row" id="dayTabs"></div>
+
+        <div id="scheduleContent"></div>
+      </div>
+    </div>
+
+    <!-- CHAT SCREEN -->
+    <div class="screen" id="screen-chat">
+      <div class="chat-container">
+        <div class="chat-messages" id="chatMessages">
+          <div class="msg msg-ai">
+            Hey! I'm your Life OS assistant — I have your full plan in context. I can help you adjust your schedule, set this week's business tasks, flag accountability issues, or just think through something. What's on your mind? 🤺
+          </div>
+        </div>
+        <div class="chat-input-area">
+          <textarea class="input" id="chatInput" placeholder="Ask anything about your plan..." rows="1" 
+            oninput="autoResize(this)" onkeydown="handleChatKey(event)"></textarea>
+          <button class="chat-send-btn" onclick="sendMessage()">↑</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- HEALTH SCREEN -->
+    <div class="screen" id="screen-health">
+      <div class="section">
+        <div class="section-title">Health</div>
+        <div class="section-sub">Fitness · Nutrition · Recovery</div>
+
+        <!-- Tabs -->
+        <div class="chip-row" style="margin-bottom:16px">
+          <div class="chip active" onclick="switchHealthTab('workout',this)">Workout</div>
+          <div class="chip" onclick="switchHealthTab('nutrition',this)">Nutrition</div>
+          <div class="chip" onclick="switchHealthTab('recovery',this)">Recovery</div>
+        </div>
+
+        <!-- Workout Tab -->
+        <div id="healthTab-workout">
+          <div class="alert alert-blue">
+            <div class="alert-icon">💪</div>
+            <div>Phase 1 · Week 1 · Tuesday & Saturday sessions. Start with 2-minute rule if you're not feeling it.</div>
+          </div>
+
+          <div class="label">TODAY'S SESSION — TUESDAY</div>
+          <div id="workoutContent"></div>
+
+          <div style="margin-top:16px">
+            <button class="btn btn-primary btn-full" onclick="startWorkout()">▶ Start Workout</button>
+          </div>
+        </div>
+
+        <!-- Nutrition Tab -->
+        <div id="healthTab-nutrition" style="display:none">
+          <div class="label">WEEKLY NUTRITION BALANCE</div>
+          <div class="card">
+            <div class="nutrition-summary">
+              <div class="nutrition-item">
+                <div class="nutrition-val nutrition-ok" id="calVal">1,380</div>
+                <div class="nutrition-lbl">Calories</div>
+              </div>
+              <div class="nutrition-item">
+                <div class="nutrition-val nutrition-warn" id="protVal">28g</div>
+                <div class="nutrition-lbl">Protein</div>
+              </div>
+              <div class="nutrition-item">
+                <div class="nutrition-val nutrition-ok" id="carbVal">180g</div>
+                <div class="nutrition-lbl">Carbs</div>
+              </div>
+              <div class="nutrition-item">
+                <div class="nutrition-val nutrition-warn" id="fiberVal">12g</div>
+                <div class="nutrition-lbl">Fiber</div>
+              </div>
+            </div>
+            <div class="alert alert-amber" style="margin-bottom:0">
+              <div class="alert-icon">⚠️</div>
+              <div>Protein is below target (goal: 40g+). Consider adding edamame or eggs to lunch this week.</div>
+            </div>
+          </div>
+
+          <div class="label">75 HARD PREP TRACKER</div>
+          <div class="card" style="padding:4px 18px">
+            <div class="habit-row">
+              <div class="habit-icon">💧</div>
+              <div class="habit-info"><div class="habit-name">1 Gallon Water</div></div>
+              <div class="habit-check" id="hard75Water" onclick="toggleHabit75('water')"></div>
+            </div>
+            <div class="habit-row">
+              <div class="habit-icon">📚</div>
+              <div class="habit-info"><div class="habit-name">10 Pages Reading</div></div>
+              <div class="habit-check" id="hard75Read" onclick="toggleHabit75('read')"></div>
+            </div>
+            <div class="habit-row">
+              <div class="habit-icon">💪</div>
+              <div class="habit-info"><div class="habit-name">Workout Completed</div></div>
+              <div class="habit-check" id="hard75Work" onclick="toggleHabit75('work')"></div>
+            </div>
+            <div class="habit-row" style="border:none">
+              <div class="habit-icon">🌿</div>
+              <div class="habit-info"><div class="habit-name">Clean Eating</div></div>
+              <div class="habit-check" id="hard75Eat" onclick="toggleHabit75('eat')"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Recovery Tab -->
+        <div id="healthTab-recovery" style="display:none">
+          <div class="label">⚡ ENERGY MANAGEMENT</div>
+          <div class="card" style="padding:4px 18px">
+            <div class="toggle-row">
+              <div>
+                <div class="toggle-label">Ultradian Rhythm</div>
+                <div class="toggle-sub">First 90 min of every block = hardest task. Second block = lighter work.</div>
+              </div>
+              <div class="badge badge-blue">Daily</div>
+            </div>
+            <div class="toggle-row">
+              <div>
+                <div class="toggle-label">Monday Rule</div>
+                <div class="toggle-sub">4+ context switches — low complexity business tasks only. No deep coding.</div>
+              </div>
+              <div class="badge badge-amber">Mon</div>
+            </div>
+            <div class="toggle-row" style="border:none">
+              <div>
+                <div class="toggle-label">Morning Sunlight</div>
+                <div class="toggle-sub">5–10 min outdoors within 30 min of waking. Counteracts sleep apnea fragmentation.</div>
+              </div>
+              <div class="badge badge-green">Daily</div>
+            </div>
+          </div>
+
+          <div class="label">RECOVERY SIGNALS</div>
+          <div class="card">
+            <div class="toggle-row">
+              <div>
+                <div class="toggle-label">Samsung Watch Check</div>
+                <div class="toggle-sub">Check resting HR + sleep score this morning</div>
+              </div>
+              <div class="badge badge-amber">Weekly</div>
+            </div>
+            <div style="padding:12px 0">
+              <div style="font-size:13px;color:var(--text2);margin-bottom:12px">How's your energy today?</div>
+              <input type="range" class="pulse-slider" min="1" max="10" value="7" id="energySlider" oninput="updateEnergy(this.value)">
+              <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text3);margin-top:6px">
+                <span>Exhausted</span>
+                <span id="energyVal" style="color:var(--blue);font-weight:600">7/10</span>
+                <span>Fully charged</span>
+              </div>
+            </div>
+            <div class="divider"></div>
+            <div class="alert alert-green" style="margin-bottom:0">
+              <div class="alert-icon">✅</div>
+              <div>Energy 7/10 — proceed with full workout. If drops below 5, switch to active recovery only.</div>
+            </div>
+          </div>
+
+          <div class="label">SLEEP APNEA NOTES</div>
+          <div class="card">
+            <div style="font-size:13px;color:var(--text2);line-height:1.6">
+              CPAP setup is part of your night routine — non-negotiable. Check your Samsung watch sleep score weekly. Elevated resting HR = not recovered. On those days: minimum viable day floor only, no guilt.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- EXPLORE SCREEN (Recipe Finder + Closet + Reviews) -->
+    <div class="screen" id="screen-explore">
+      <div class="section">
+        <div class="section-title">Explore</div>
+        <div class="section-sub">Recipes · Closet · Reviews</div>
+
+        <div class="chip-row" style="margin-bottom:20px">
+          <div class="chip active" onclick="switchExploreTab('recipes',this)">🍜 Recipes</div>
+          <div class="chip" onclick="switchExploreTab('closet',this)">👔 Closet</div>
+          <div class="chip" onclick="switchExploreTab('reviews',this)">⭐ Reviews</div>
+          <div class="chip" onclick="switchExploreTab('pantry',this)">🧂 Pantry</div>
+        </div>
+
+        <!-- RECIPES TAB -->
+        <div id="exploreTab-recipes">
+          <div class="label">WEEK 1 · JAPANESE ROTATION</div>
+          <div class="nutrition-summary" style="margin-bottom:16px">
+            <div class="nutrition-item">
+              <div class="nutrition-val nutrition-ok">1,380</div>
+              <div class="nutrition-lbl">Avg cal</div>
+            </div>
+            <div class="nutrition-item">
+              <div class="nutrition-val nutrition-warn">28g</div>
+              <div class="nutrition-lbl">Protein</div>
+            </div>
+            <div class="nutrition-item">
+              <div class="nutrition-val nutrition-ok">180g</div>
+              <div class="nutrition-lbl">Carbs</div>
+            </div>
+            <div class="nutrition-item">
+              <div class="nutrition-val nutrition-ok">38g</div>
+              <div class="nutrition-lbl">Fat</div>
+            </div>
+          </div>
+
+          <div class="swipe-stack" id="swipeStack">
+            <!-- Cards rendered by JS -->
+          </div>
+          <div class="swipe-actions">
+            <button class="swipe-btn swipe-btn-skip" onclick="swipeCard('skip')" title="Skip">✕</button>
+            <button class="swipe-btn swipe-btn-save" onclick="swipeCard('save')" title="Save for later">🔖</button>
+            <button class="swipe-btn swipe-btn-add" onclick="swipeCard('add')" title="Add to week">✓</button>
+            <button class="swipe-btn swipe-btn-love" onclick="swipeCard('love')" title="Love it — keep forever">♥</button>
+          </div>
+          <div style="text-align:center;margin-top:12px;font-size:12px;color:var(--text3)">
+            ✕ Skip · 🔖 Save · ✓ Add to week · ♥ Love it
+          </div>
+        </div>
+
+        <!-- CLOSET TAB -->
+        <div id="exploreTab-closet" style="display:none">
+          <div class="alert alert-blue">
+            <div class="alert-icon">👔</div>
+            <div>Outfit suggested based on today's schedule (Class + Work · Smart Casual) and San Diego weather (72°F, sunny)</div>
+          </div>
+
+          <div class="label">TODAY'S OUTFIT</div>
+          <div class="outfit-card">
+            <div style="font-size:13px;color:var(--text3);margin-bottom:8px">Thursday · Class + Work · 72°F ☀️</div>
+            <div class="outfit-display">👕 👖 👟</div>
+            <div class="outfit-items">
+              <div class="outfit-item">
+                <div class="outfit-item-emoji">👕</div>
+                <div>
+                  <div class="outfit-item-name">Navy fitted tee</div>
+                  <div class="outfit-item-type">Top · Casual</div>
+                </div>
+              </div>
+              <div class="outfit-item">
+                <div class="outfit-item-emoji">👖</div>
+                <div>
+                  <div class="outfit-item-name">Dark chinos</div>
+                  <div class="outfit-item-type">Bottom · Smart Casual</div>
+                </div>
+              </div>
+              <div class="outfit-item">
+                <div class="outfit-item-emoji">👟</div>
+                <div>
+                  <div class="outfit-item-name">White clean sneakers</div>
+                  <div class="outfit-item-type">Shoes · Casual</div>
+                </div>
+              </div>
+            </div>
+            <div style="margin-top:16px;display:flex;gap:10px">
+              <button class="btn btn-ghost btn-sm" style="flex:1" onclick="showOutfitAlt()">Show another</button>
+              <button class="btn btn-primary btn-sm" style="flex:1" onclick="useOutfit()">Use this ✓</button>
+            </div>
+          </div>
+
+          <div class="label" style="margin-top:20px">ADD CLOTHING ITEM</div>
+          <div class="card">
+            <div style="font-size:13px;color:var(--text2);margin-bottom:12px">Photograph each item once to build your Virtual Closet. Start with 10 items to unlock suggestions.</div>
+            <button class="btn btn-ghost btn-full" onclick="addClothingItem()">📸 Add item from camera</button>
+          </div>
+        </div>
+
+        <!-- REVIEWS TAB -->
+        <div id="exploreTab-reviews" style="display:none">
+          <div class="chip-row" style="margin-bottom:16px">
+            <div class="chip active" onclick="switchReviewFilter('all',this)">All</div>
+            <div class="chip" onclick="switchReviewFilter('books',this)">📚 Books</div>
+            <div class="chip" onclick="switchReviewFilter('food',this)">🍽️ Food</div>
+            <div class="chip" onclick="switchReviewFilter('film',this)">🎬 Film</div>
+            <div class="chip" onclick="switchReviewFilter('places',this)">📍 Places</div>
+          </div>
+
+          <div id="reviewsContent"></div>
+          <button class="btn btn-ghost btn-full" style="margin-top:8px" onclick="addReview()">+ Add review</button>
+        </div>
+
+        <!-- PANTRY TAB -->
+        <div id="exploreTab-pantry" style="display:none">
+          <div class="label">PANTRY STATUS</div>
+          <div class="card" style="padding:4px 18px" id="pantryContent"></div>
+          <button class="btn btn-ghost btn-full btn-sm" style="margin-top:12px" onclick="addPantryItem()">+ Add item</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- GOALS SCREEN -->
+    <div class="screen" id="screen-goals">
+      <div class="section">
+        <div class="section-title">Goals</div>
+        <div class="section-sub">Business · Health · Life</div>
+
+        <!-- Business Roadmap -->
+        <div class="label">📅 8-WEEK BUSINESS ROADMAP</div>
+        <div class="card" style="padding:4px 18px" id="businessMilestones"></div>
+
+        <!-- Financial -->
+        <div class="label" style="margin-top:4px">💰 FINANCIAL PULSE</div>
+        <div class="card">
+          <div class="grid-2" style="margin-bottom:12px">
+            <div class="stat-card">
+              <div class="stat-value" style="color:var(--green);font-size:20px">$0</div>
+              <div class="stat-label">Business account</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-value" style="color:var(--amber);font-size:20px">$0</div>
+              <div class="stat-label">This month spend</div>
+            </div>
+          </div>
+          <div class="alert alert-amber" style="margin-bottom:0">
+            <div class="alert-icon">💡</div>
+            <div>Open Mercury account this week. Set $150/mo auto-transfer.</div>
+          </div>
+        </div>
+
+        <!-- Weight Loss -->
+        <div class="label">⚖️ WEIGHT LOSS JOURNEY</div>
+        <div class="card">
+          <div style="font-size:13px;color:var(--text2);margin-bottom:12px">Target: 50–70 lbs over the year · Book medication appointment this week</div>
+          <div class="progress-bar" style="margin-bottom:8px">
+            <div class="progress-fill" style="width:0%;background:var(--green)"></div>
+          </div>
+          <div style="font-size:12px;color:var(--text3)">0 lbs toward goal · Progress updates monthly</div>
+          <button class="btn btn-ghost btn-sm btn-full" style="margin-top:12px" onclick="logWeight()">Log weight</button>
+        </div>
+
+        <!-- Club Leadership -->
+        <div class="label">🏛️ CLUB LEADERSHIP</div>
+        <div class="card" style="padding:4px 18px">
+          <div class="toggle-row">
+            <div>
+              <div class="toggle-label">Club President</div>
+              <div class="toggle-sub">Issues: Wed mornings + meeting days only</div>
+            </div>
+            <div class="badge badge-purple">Active</div>
+          </div>
+          <div class="toggle-row" style="border:none">
+            <div>
+              <div class="toggle-label">Club VP</div>
+              <div class="toggle-sub">Delegate everything possible until June</div>
+            </div>
+            <div class="badge badge-purple">Active</div>
+          </div>
+        </div>
+
+        <!-- Sunday Check-in CTA -->
+        <div class="label" style="margin-top:4px">📋 WEEKLY CHECK-IN</div>
+        <div class="card" style="text-align:center;padding:24px">
+          <div style="font-size:36px;margin-bottom:12px">🗓️</div>
+          <div style="font-size:16px;font-weight:600;margin-bottom:6px">Sunday Check-In</div>
+          <div style="font-size:13px;color:var(--text2);margin-bottom:16px">Every Sunday · 20–30 min · Produces your adjusted week + task list</div>
+          <button class="btn btn-primary btn-full" onclick="startCheckin()">Start Check-In</button>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- end main -->
+
+  <!-- BOTTOM NAV -->
+  <div class="nav">
+    <div class="nav-item active" onclick="navigate('home')" id="nav-home">
+      <div class="nav-icon">🏠</div>
+      <div class="nav-label">Home</div>
+    </div>
+    <div class="nav-item" onclick="navigate('schedule')" id="nav-schedule">
+      <div class="nav-icon">📅</div>
+      <div class="nav-label">Schedule</div>
+    </div>
+    <div class="nav-item" onclick="navigate('chat')" id="nav-chat">
+      <div class="nav-icon">💬</div>
+      <div class="nav-label">Claude</div>
+    </div>
+    <div class="nav-item" onclick="navigate('health')" id="nav-health">
+      <div class="nav-icon">💪</div>
+      <div class="nav-label">Health</div>
+    </div>
+    <div class="nav-item" onclick="navigate('explore')" id="nav-explore">
+      <div class="nav-icon">✨</div>
+      <div class="nav-label">Explore</div>
+    </div>
+    <div class="nav-item" onclick="navigate('goals')" id="nav-goals">
+      <div class="nav-icon">🎯</div>
+      <div class="nav-label">Goals</div>
+    </div>
+  </div>
+
+  <!-- BUG BUTTON -->
+  <div class="bug-btn" onclick="reportBug()" title="Report issue">🐛</div>
+
+  <!-- MODAL -->
+  <div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
+    <div class="modal" id="modal">
+      <div class="modal-handle"></div>
+      <div id="modalContent"></div>
+    </div>
+  </div>
+
+</div><!-- end app -->
+
+<script>
+// ── STATE ─────────────────────────────────────────────────────────────────
+const state = {
+  habits: { water: 0, read: false, sun: false, med: false, sleep: false },
+  tasks: {},
+  workoutStreak: 0,
+  readStreak: 0,
+  chatHistory: [],
+  currentDay: new Date().getDay(), // 0=Sun, 1=Mon...
+  hard75: { water: false, read: false, work: false, eat: false },
+  currentExercise: 0,
+  swipeIndex: 0,
+};
+
+// Load from localStorage
+function loadState() {
+  try {
+    const saved = localStorage.getItem('lifeos_state');
+    if (saved) Object.assign(state, JSON.parse(saved));
+  } catch(e) {}
+}
+function saveState() {
+  try { localStorage.setItem('lifeos_state', JSON.stringify(state)); } catch(e) {}
+}
+loadState();
+
+// ── DATA ──────────────────────────────────────────────────────────────────
+const DAYS = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+const DAYS_SHORT = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+
+const SCHEDULE = {
+  Monday: [
+    { time: '6:30am', title: '🛌 Wake up', note: '', color: 'var(--surface3)' },
+    { time: '6:30–7:05am', title: '🧴 Morning routine', note: 'Condensed with night prep', color: 'var(--surface3)' },
+    { time: '7:15–9:30am', title: '🏢 Business deep work', note: '~2hrs 15min — low complexity tasks', color: 'var(--blue-dim)' },
+    { time: '10am–1pm', title: '💼 Work (WFH)', note: '', color: 'var(--purple-dim)' },
+    { time: '1–1:45pm', title: '🍽️ Lunch', note: 'Real break — step away from desk', color: 'var(--surface3)' },
+    { time: '1:45–3pm', title: '💼 Work (WFH)', note: '', color: 'var(--purple-dim)' },
+    { time: '3:15–4:30pm', title: '🏢 Business block', note: '~1hr 15min lighter tasks', color: 'var(--blue-dim)' },
+    { time: '4:30–5pm', title: '🔄 Flex block', note: 'Absorb overruns or rest', color: 'var(--amber-dim)' },
+    { time: '5–5:30pm', title: '🍽️ Light dinner + ready', note: '', color: 'var(--surface3)' },
+    { time: '5:30–6pm', title: '🚗 Commute to campus', note: '30 min', color: 'var(--surface3)' },
+    { time: '6:30–9:20pm', title: '📚 Class', note: '', color: 'var(--green-dim)' },
+    { time: '9:20–10pm', title: '🚗 Commute home', note: 'Decompress — podcast or silence', color: 'var(--surface3)' },
+    { time: '10–10:30pm', title: '📺 TV / wind down', note: 'Partner time', color: 'var(--surface3)' },
+    { time: '10:30–11pm', title: '🌙 Night routine + next day prep', note: '', color: 'var(--surface3)' },
+    { time: '11pm', title: '🛌 Bed', note: 'Non-negotiable', color: 'var(--red-dim)' },
+  ],
+  Tuesday: [
+    { time: '7am', title: '🛌 Wake up', note: '', color: 'var(--surface3)' },
+    { time: '7–7:35am', title: '🧴 Morning routine', note: 'Sunlight within 30 min of waking', color: 'var(--surface3)' },
+    { time: '7:45–10am', title: '🏢 Business deep work', note: '~2hrs 15min — HARDEST tasks here', color: 'var(--blue-dim)' },
+    { time: '10:30am', title: '🚗 Commute to campus', note: '30 min', color: 'var(--surface3)' },
+    { time: '11am–2pm', title: '📚 Class', note: '', color: 'var(--green-dim)' },
+    { time: '2–2:45pm', title: '📖 Study/homework', note: 'Active recall — no passive re-reading', color: 'var(--green-dim)' },
+    { time: '3–4pm', title: '💼 Work (online)', note: 'From campus or home', color: 'var(--purple-dim)' },
+    { time: '4–4:45pm', title: '💪 Workout (home)', note: 'Strength + agility — 45 min', color: 'var(--amber-dim)' },
+    { time: '4:45–5pm', title: '🚿 Shower + change', note: '', color: 'var(--surface3)' },
+    { time: '6–7pm', title: '🍽️ Dinner', note: '', color: 'var(--surface3)' },
+    { time: '8–9:30pm', title: '📺 TV with partner', note: '', color: 'var(--surface3)' },
+    { time: '11pm', title: '🛌 Bed', note: '', color: 'var(--red-dim)' },
+  ],
+  Wednesday: [
+    { time: '7am', title: '🛌 Wake up', note: '', color: 'var(--surface3)' },
+    { time: '7:45–9:30am', title: '🏢 Business deep work', note: '~1hr 45min', color: 'var(--blue-dim)' },
+    { time: '9:30–9:45am', title: '🏛️ Club coordination', note: 'Async only — no fires', color: 'var(--purple-dim)' },
+    { time: '10:30am', title: '🚗 Commute to campus', note: '30 min', color: 'var(--surface3)' },
+    { time: '11am–2pm', title: '📚 Class', note: '', color: 'var(--green-dim)' },
+    { time: '2:30–5:30pm', title: '💼 Work (WFH)', note: 'Best weekday — no work commute', color: 'var(--purple-dim)' },
+    { time: '5:30–6pm', title: '🔄 Flex block', note: 'Every other week: club meeting', color: 'var(--amber-dim)' },
+    { time: '8–9:30pm', title: '📺 TV with partner', note: '', color: 'var(--surface3)' },
+    { time: '11pm', title: '🛌 Bed', note: '', color: 'var(--red-dim)' },
+  ],
+  Thursday: [
+    { time: '7am', title: '🛌 Wake up', note: '', color: 'var(--surface3)' },
+    { time: '7:45–10am', title: '🏢 Business deep work', note: '~2hrs 15min — second hardest tasks', color: 'var(--blue-dim)' },
+    { time: '10:30am', title: '🚗 Commute to campus', note: '30 min', color: 'var(--surface3)' },
+    { time: '11am–2pm', title: '📚 Class', note: 'Through May 8', color: 'var(--green-dim)' },
+    { time: '2–2:30pm', title: '📖 Study/homework', note: '', color: 'var(--green-dim)' },
+    { time: '2:30–5:30pm', title: '💼 Work (in person)', note: '10 min from campus', color: 'var(--purple-dim)' },
+    { time: '5:30–6pm', title: '🚗 Commute home', note: '', color: 'var(--surface3)' },
+    { time: '6–6:30pm', title: '🔄 Flex block', note: 'Decompress, errands, or rest', color: 'var(--amber-dim)' },
+    { time: '8–9:30pm', title: '📺 TV with partner', note: '', color: 'var(--surface3)' },
+    { time: '11pm', title: '🛌 Bed', note: '', color: 'var(--red-dim)' },
+  ],
+  Friday: [
+    { time: '7am', title: '🛌 Wake up', note: '', color: 'var(--surface3)' },
+    { time: '7:45–10am', title: '🏢 Business deep work', note: '~2hrs 15min — medium/light tasks', color: 'var(--blue-dim)' },
+    { time: '10:30am', title: '🚗 Commute to campus', note: '30 min', color: 'var(--surface3)' },
+    { time: '11am–2pm', title: '📚 Class', note: 'Through May 8', color: 'var(--green-dim)' },
+    { time: '2:30–5:30pm', title: '💼 Work (in person)', note: '', color: 'var(--purple-dim)' },
+    { time: '6–6:30pm', title: '🔄 Flex block', note: 'Start weekend mode', color: 'var(--amber-dim)' },
+    { time: '7:30–8:30pm', title: '🎨 Creative time', note: 'Painting, pottery, project — your choice', color: 'rgba(236,72,153,0.15)' },
+    { time: '8:30–10pm', title: '📺 TV with partner', note: '', color: 'var(--surface3)' },
+    { time: '11pm', title: '🛌 Bed', note: '', color: 'var(--red-dim)' },
+  ],
+  Saturday: [
+    { time: '7:30am', title: '🛌 Wake up (gentle)', note: '', color: 'var(--surface3)' },
+    { time: '8:30–10:30am', title: '🏢 Business deep work (Block 1)', note: '2hrs — most important weekly session', color: 'var(--blue-dim)' },
+    { time: '10:45am–12pm', title: '🏢 Business deep work (Block 2)', note: '1hr 15min', color: 'var(--blue-dim)' },
+    { time: '12–1pm', title: '🍽️ Lunch', note: 'Real break — step away completely', color: 'var(--surface3)' },
+    { time: '1:15–2:45pm', title: '💪 Workout', note: 'Full session — campus gym or outdoor', color: 'var(--amber-dim)' },
+    { time: '3–5pm', title: '🎨 Creative time', note: 'Pottery, painting, project — your call', color: 'rgba(236,72,153,0.15)' },
+    { time: '5–6pm', title: '🛒 Groceries + 🍱 Meal prep', note: '', color: 'var(--green-dim)' },
+    { time: '8–10pm', title: '📺 TV / partner time', note: '', color: 'var(--surface3)' },
+    { time: '11:30pm', title: '🛌 Bed', note: '', color: 'var(--red-dim)' },
+  ],
+  Sunday: [
+    { time: '7:30am', title: '🛌 Wake up', note: '', color: 'var(--surface3)' },
+    { time: '8:15–9am', title: '🗓️ Weekly review + planning', note: '30 min — produce next week task list', color: 'var(--blue-dim)' },
+    { time: '10am–12pm', title: '🔄 Weekly catch-up block', note: '2hrs safety net for anything unfinished', color: 'var(--amber-dim)' },
+    { time: '1–1:45pm', title: '💪 Active recovery', note: 'Walk, light bike, yoga — easy movement', color: 'var(--amber-dim)' },
+    { time: '1:45–3pm', title: '🎨 Creative time OR rest', note: 'No guilt either way', color: 'var(--surface3)' },
+    { time: '6–7pm', title: '🍽️ Dinner', note: '', color: 'var(--surface3)' },
+    { time: '7–8:30pm', title: '📺 TV / partner time', note: '', color: 'var(--surface3)' },
+    { time: '9–9:30pm', title: '🌙 Night routine + Monday prep', note: 'CRITICAL — Monday is brutal', color: 'var(--red-dim)' },
+    { time: '10:30pm', title: '🛌 Bed', note: 'Early — protect Monday', color: 'var(--red-dim)' },
+  ],
+};
+
+const EXERCISES = [
+  { name: 'Goblet Squat', sets: '3 sets × 12 reps', emoji: '🏋️', cues: ['Hold dumbbell at chest height', 'Feet shoulder-width, toes slightly out', 'Chest tall, don\'t fold forward'], purpose: 'Builds lunge base and leg drive — your primary attack mechanism in foil', mistake: 'Knees caving in — push them out' },
+  { name: 'Romanian Deadlift', sets: '3 sets × 10 reps', emoji: '💪', cues: ['Hinge at hips, not the waist', 'Bar/dumbbells stay close to legs', 'Feel the hamstring stretch at bottom'], purpose: 'Posterior chain strength for explosive recovery from the lunge', mistake: 'Rounding the lower back — keep it neutral' },
+  { name: 'Walking Lunges', sets: '3 sets × 10 each leg', emoji: '🤺', cues: ['Long stride forward', 'Front knee tracks over second toe', 'Push through front heel to stand'], purpose: 'Direct fencing movement — this IS your lunge. Build strength here.', mistake: 'Front knee collapsing inward' },
+  { name: 'Side Shuffle + Stop', sets: '3 sets × 20 meters', emoji: '⚡', cues: ['Stay low in athletic stance', 'Quick feet, don\'t cross them', 'Sharp stop at each end — control'], purpose: 'Footwork reactivation — advance/retreat patterns your D1 body remembers', mistake: 'Standing up too tall during movement' },
+  { name: 'Plank Hold', sets: '3 sets × 30 seconds', emoji: '🧱', cues: ['Forearms on ground, elbows under shoulders', 'Body in straight line hip to heel', 'Breathe — don\'t hold your breath'], purpose: 'Core stability is everything in foil — guards your point control', mistake: 'Hips too high or sagging' },
+];
+
+const RECIPES = [
+  { name: 'Chicken Teriyaki Bowl', cuisine: '🇯🇵 Japanese', meal: 'Lunch', time: '35 min', cal: 520, protein: 42, carbs: 55, fat: 11, emoji: '🍱', pantryItems: ['Soy sauce ✅', 'Mirin ✅', 'Sesame oil ✅'], buy: ['Chicken thighs', 'Japanese rice', 'Edamame'] },
+  { name: 'Japanese Curry', cuisine: '🇯🇵 Japanese', meal: 'Lunch', time: '40 min', cal: 490, protein: 35, carbs: 62, fat: 12, emoji: '🍛', pantryItems: ['S&B Curry roux ✅', 'Soy sauce ✅'], buy: ['Chicken', 'Potato', 'Carrot'] },
+  { name: 'Spam Musubi', cuisine: '🌺 Hawaiian', meal: 'Breakfast', time: '20 min', cal: 380, protein: 14, carbs: 58, fat: 10, emoji: '🍙', pantryItems: ['Soy sauce ✅', 'Nori ✅'], buy: ['Spam', 'Japanese rice'] },
+  { name: 'Pad See Ew', cuisine: '🇹🇭 Thai', meal: 'Lunch', time: '20 min', cal: 480, protein: 32, carbs: 58, fat: 12, emoji: '🍜', pantryItems: ['Fish sauce ✅', 'Oyster sauce ✅', 'Soy sauce ✅'], buy: ['Wide rice noodles', 'Ground turkey', 'Chinese broccoli'] },
+  { name: 'Char Siu Pork Bowl', cuisine: '🇨🇳 Chinese', meal: 'Lunch', time: '45 min', cal: 510, protein: 40, carbs: 50, fat: 14, emoji: '🥩', pantryItems: ['Hoisin ✅', 'Five spice ✅', 'Honey ✅'], buy: ['Pork tenderloin', 'Bok choy'] },
+  { name: 'Onigiri', cuisine: '🇯🇵 Japanese', meal: 'Dinner', time: '15 min', cal: 220, protein: 8, carbs: 42, fat: 2, emoji: '🍙', pantryItems: ['Nori ✅', 'Rice ✅'], buy: ['Filling of choice'] },
+];
+
+const REVIEWS = [
+  { type: 'book', emoji: '📚', title: 'Project Hail Mary', sub: 'Andy Weir · In progress', preview: 'Currently reading — 10 pages/day. Hard sci-fi, incredibly engaging. Perfect commute audiobook material.', links: ['Goodreads', 'Notes'], rating: null, status: 'reading' },
+  { type: 'book', emoji: '📚', title: 'Magpie Murders', sub: 'Anthony Horowitz · Up next', preview: 'Queued after Project Hail Mary. Mystery within a mystery — reportedly brilliant structure.', links: ['Goodreads'], rating: null, status: 'queue' },
+  { type: 'places', emoji: '🏰', title: 'Munich Trip', sub: 'Germany · Recent visit', preview: 'Recently returned — memorable experience. Add your notes and photos from the trip.', links: ['Google Maps', 'Google Photos', 'Notes'], rating: '⭐⭐⭐⭐⭐' },
+];
+
+const PANTRY = [
+  { name: 'Soy sauce (low sodium)', status: 'ok' },
+  { name: 'Oyster sauce', status: 'ok' },
+  { name: 'Fish sauce', status: 'ok' },
+  { name: 'Sesame oil', status: 'ok' },
+  { name: 'Mirin', status: 'ok' },
+  { name: 'Hoisin sauce', status: 'ok' },
+  { name: 'Kewpie mayo', status: 'low' },
+  { name: 'Sriracha', status: 'ok' },
+  { name: 'Rice vinegar', status: 'ok' },
+  { name: 'S&B Japanese curry roux', status: 'low' },
+  { name: 'Nori sheets', status: 'ok' },
+  { name: 'Sesame seeds', status: 'low' },
+  { name: 'White pepper', status: 'ok' },
+  { name: 'Five spice powder', status: 'ok' },
+  { name: 'Togarashi', status: 'out' },
+  { name: 'Cornstarch', status: 'ok' },
+  { name: 'Dashi powder', status: 'ok' },
+  { name: 'Panko breadcrumbs', status: 'ok' },
+];
+
+const BUSINESS_MILESTONES = [
+  { phase: 'Phase 1 · Weeks 1–2', title: 'Foundation', tasks: ['Write 1-page concept doc', 'Define MVP scope', 'Identify 10 target users', 'Competitive research', 'Open Mercury account', 'Buy domain'], done: false, current: true },
+  { phase: 'Phase 2 · Weeks 3–5', title: 'Build', tasks: ['Begin vibe coding POC', 'Stand up landing page', 'Run 3–5 market research interviews', 'Set up hosting + business email'], done: false, current: false },
+  { phase: 'Week 4', title: '🔴 Mid-Point Checkpoint', tasks: ['Honest assessment', 'Market validation check', 'Pivot or continue decision', 'Schedule deload week'], done: false, current: false },
+  { phase: 'Phase 3 · Weeks 6–7', title: 'Validate + Incorporate Prep', tasks: ['Demo POC to 3+ users', 'Iterate on feedback', 'Apply for EIN', 'Research LLC requirements'], done: false, current: false },
+  { phase: 'Phase 4 · Week 8', title: 'Review + Reset', tasks: ['Honest review of everything', 'Set 3 summer goals', 'Decide incorporation timeline'], done: false, current: false },
+];
+
+// ── INIT ──────────────────────────────────────────────────────────────────
+function init() {
+  updateDateTime();
+  renderSchedule();
+  renderWorkout();
+  renderReviews();
+  renderPantry();
+  renderBusinessMilestones();
+  renderRecipes();
+  renderTodaySchedule();
+  setInterval(updateDateTime, 60000);
+}
+
+function updateDateTime() {
+  const now = new Date();
+  const days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const dateStr = `${days[now.getDay()]}, ${months[now.getMonth()]} ${now.getDate()}`;
+  document.getElementById('headerDate').textContent = dateStr;
+  document.getElementById('welcomeDate').textContent = dateStr;
+  
+  const h = now.getHours();
+  const greeting = h < 12 ? 'Good morning' : h < 17 ? 'Good afternoon' : 'Good evening';
+  document.getElementById('greeting').textContent = `${greeting} 🤺`;
+}
+
+// ── NAVIGATION ────────────────────────────────────────────────────────────
+function navigate(screen) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('screen-' + screen).classList.add('active');
+  document.getElementById('nav-' + screen).classList.add('active');
+  window.scrollTo(0, 0);
+  document.getElementById('mainContent').scrollTop = 0;
+}
+
+// ── SCHEDULE ──────────────────────────────────────────────────────────────
+function renderSchedule() {
+  const tabRow = document.getElementById('dayTabs');
+  const today = new Date().getDay();
+  tabRow.innerHTML = DAYS.map((d, i) => 
+    `<div class="day-tab ${i === today ? 'active' : ''}" onclick="showDay(${i}, this)">${DAYS_SHORT[i]}</div>`
+  ).join('');
+  showDayByIndex(today);
+}
+
+function showDay(idx, el) {
+  document.querySelectorAll('.day-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  showDayByIndex(idx);
+}
+
+function showDayByIndex(idx) {
+  const dayName = DAYS[idx];
+  const blocks = SCHEDULE[dayName] || [];
+  const content = document.getElementById('scheduleContent');
+  
+  if (!blocks.length) {
+    content.innerHTML = '<div class="card" style="text-align:center;color:var(--text3);padding:40px">No schedule data</div>';
+    return;
+  }
+
+  const mvd = {
+    Monday: '✅ Show up to work · Show up to class · Sleep by 11pm',
+    Tuesday: '✅ Show up to class · Complete 1 business task · Sleep by 11pm',
+    Wednesday: '✅ Show up to class · Show up to work · Complete 1 business task',
+    Thursday: '✅ Show up to class · Show up to work · Complete 1 business task',
+    Friday: '✅ Show up to class · Show up to work · Do something that recharges you',
+    Saturday: '✅ 1 business task · 1 workout OR walk · Meal prep at least partially',
+    Sunday: '✅ Complete check-in · Plan next week · Rest intentionally',
+  };
+
+  content.innerHTML = `
+    <div class="alert alert-amber" style="margin-bottom:16px">
+      <div class="alert-icon">🎯</div>
+      <div><strong>Minimum viable day:</strong> ${mvd[dayName]}</div>
+    </div>
+    <div class="card" style="padding:8px 18px">
+      ${blocks.map(b => `
+        <div class="time-block">
+          <div class="time-block-time">${b.time}</div>
+          <div class="time-block-dot" style="background:${b.color || 'var(--surface3)'};margin-top:6px"></div>
+          <div class="time-block-content">
+            <div class="time-block-title">${b.title}</div>
+            ${b.note ? `<div class="time-block-note">${b.note}</div>` : ''}
+          </div>
+        </div>
+      `).join('')}
+    </div>`;
+}
+
+function renderTodaySchedule() {
+  const today = new Date().getDay();
+  const dayName = DAYS[today];
+  const blocks = SCHEDULE[dayName] || [];
+  const el = document.getElementById('todaySchedule');
+  
+  const now = new Date();
+  const currentHour = now.getHours() + now.getMinutes()/60;
+  
+  // Show next 3 blocks
+  const upcoming = blocks.slice(0, 4);
+  el.innerHTML = upcoming.map(b => `
+    <div class="time-block">
+      <div class="time-block-time">${b.time}</div>
+      <div class="time-block-dot" style="background:${b.color || 'var(--border2)'}"></div>
+      <div class="time-block-content">
+        <div class="time-block-title">${b.title}</div>
+        ${b.note ? `<div class="time-block-note">${b.note}</div>` : ''}
+      </div>
+    </div>
+  `).join('') + (blocks.length > 4 ? `<div style="text-align:center;padding:8px 0;font-size:12px;color:var(--text3);cursor:pointer" onclick="navigate('schedule')">See full day →</div>` : '');
+}
+
+// ── HABITS ────────────────────────────────────────────────────────────────
+function toggleWater() {
+  state.habits.water = (state.habits.water + 1) % 5;
+  document.getElementById('waterCount').textContent = state.habits.water;
+  const btn = document.getElementById('waterBtn');
+  if (state.habits.water >= 4) {
+    btn.classList.add('done');
+    btn.textContent = '✓';
+  } else {
+    btn.classList.remove('done');
+    btn.textContent = state.habits.water > 0 ? state.habits.water + '/4' : '';
+    btn.style.fontSize = '11px';
+  }
+  saveState();
+}
+
+function toggleHabit(id) {
+  state.habits[id] = !state.habits[id];
+  const btn = document.getElementById(id + 'Btn');
+  if (state.habits[id]) {
+    btn.classList.add('done');
+    btn.textContent = '✓';
+  } else {
+    btn.classList.remove('done');
+    btn.textContent = '';
+  }
+  saveState();
+}
+
+function toggleHabit75(id) {
+  state.hard75[id] = !state.hard75[id];
+  const btn = document.getElementById('hard75' + id.charAt(0).toUpperCase() + id.slice(1));
+  if (state.hard75[id]) {
+    btn.classList.add('done');
+    btn.textContent = '✓';
+  } else {
+    btn.classList.remove('done');
+    btn.textContent = '';
+  }
+  saveState();
+}
+
+function toggleTask(row) {
+  const cb = row.querySelector('.checkbox');
+  const isChecked = cb.classList.contains('checked');
+  if (isChecked) {
+    cb.classList.remove('checked');
+    cb.textContent = '☐';
+  } else {
+    cb.classList.add('checked');
+    cb.textContent = '✓';
+  }
+}
+
+// ── WORKOUT ───────────────────────────────────────────────────────────────
+function renderWorkout() {
+  const el = document.getElementById('workoutContent');
+  if (!el) return;
+  el.innerHTML = EXERCISES.map((ex, i) => `
+    <div class="exercise-card" id="ex-${i}" ${i > 0 ? 'style="opacity:0.4"' : ''}>
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px">
+        <div>
+          <div style="font-size:12px;color:var(--text3);font-family:var(--font-mono)">${i+1} of ${EXERCISES.length}</div>
+          <div style="font-size:18px;font-weight:600;margin-top:2px">${ex.name}</div>
+          <div class="badge badge-blue" style="margin-top:6px">${ex.sets}</div>
+        </div>
+        <div style="font-size:48px">${ex.emoji}</div>
+      </div>
+      <ul class="exercise-cues">
+        ${ex.cues.map((c, ci) => `
+          <li class="exercise-cue">
+            <div class="cue-num">${ci+1}</div>
+            <span>${c}</span>
+          </li>
+        `).join('')}
+      </ul>
+      <div class="fencing-purpose">🤺 ${ex.purpose}</div>
+      <div style="margin-top:12px;padding:8px 10px;background:var(--red-dim);border-radius:6px;font-size:12px;color:var(--red)">
+        ❌ Common mistake: ${ex.mistake}
+      </div>
+      ${i === 0 ? `
+        <div style="margin-top:14px;display:flex;gap:8px">
+          <button class="btn btn-ghost btn-sm" style="flex:1" onclick="adjustExercise('easier')">😅 Too hard</button>
+          <button class="btn btn-primary btn-sm" style="flex:1" onclick="completeExercise(${i})">✓ Done</button>
+          <button class="btn btn-ghost btn-sm" style="flex:1" onclick="adjustExercise('harder')">😎 Too easy</button>
+        </div>
+      ` : ''}
+    </div>
+  `).join('');
+}
+
+function startWorkout() {
+  showModal('workout-start');
+}
+
+function completeExercise(idx) {
+  const card = document.getElementById('ex-' + idx);
+  card.style.opacity = '1';
+  card.style.borderColor = 'var(--green)';
+  
+  if (idx < EXERCISES.length - 1) {
+    const next = document.getElementById('ex-' + (idx+1));
+    if (next) {
+      next.style.opacity = '1';
+      next.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  } else {
+    showToast('💪 Workout complete! Great work.');
+    state.workoutStreak = (state.workoutStreak || 0) + 1;
+    document.getElementById('workoutStreak').textContent = state.workoutStreak;
+    updateFencingScore();
+    saveState();
+  }
+}
+
+function adjustExercise(dir) {
+  showToast(dir === 'easier' ? '📝 Noted — will reduce difficulty next session' : '📝 Noted — will increase difficulty next session');
+}
+
+function updateFencingScore() {
+  const score = Math.min(100, (state.workoutStreak || 0) * 5 + 10);
+  document.getElementById('fencingScore').textContent = score;
+  const circumference = 251.2;
+  const offset = circumference - (score / 100) * circumference;
+  const ring = document.getElementById('fencingRing');
+  if (ring) ring.setAttribute('stroke-dashoffset', offset);
+}
+
+function switchHealthTab(tab, el) {
+  document.querySelectorAll('[id^="healthTab-"]').forEach(t => t.style.display = 'none');
+  document.getElementById('healthTab-' + tab).style.display = 'block';
+  document.querySelectorAll('#screen-health .chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+}
+
+function updateEnergy(val) {
+  document.getElementById('energyVal').textContent = val + '/10';
+  const alert = document.querySelector('#healthTab-recovery .alert-green div:last-child');
+  if (alert) {
+    if (val < 5) {
+      alert.textContent = 'Energy ' + val + '/10 — switch to active recovery only today. Minimum viable day floor. No guilt.';
+    } else if (val < 7) {
+      alert.textContent = 'Energy ' + val + '/10 — moderate session. Listen to your body, scale back if needed.';
+    } else {
+      alert.textContent = 'Energy ' + val + '/10 — proceed with full workout. You\'ve got this 🤺';
+    }
+  }
+}
+
+// ── RECIPES ───────────────────────────────────────────────────────────────
+function renderRecipes() {
+  const stack = document.getElementById('swipeStack');
+  if (!stack) return;
+  
+  const recipe = RECIPES[state.swipeIndex % RECIPES.length];
+  stack.innerHTML = `
+    <div class="swipe-card" id="currentSwipeCard">
+      <div class="swipe-card-img">${recipe.emoji}</div>
+      <div class="swipe-card-body">
+        <div class="swipe-card-title">${recipe.name}</div>
+        <div class="swipe-card-meta">
+          <span class="badge badge-blue">${recipe.cuisine}</span>
+          <span class="badge badge-green">${recipe.meal}</span>
+          <span class="badge badge-amber">⏱ ${recipe.time}</span>
+        </div>
+        <div style="font-size:12px;color:var(--text3);margin-bottom:4px">Pantry items you have:</div>
+        <div style="font-size:12px;color:var(--green)">${recipe.pantryItems.join(' · ')}</div>
+        <div class="swipe-card-macros">
+          <div class="macro-item"><div class="macro-val">${recipe.cal}</div><div class="macro-lbl">Calories</div></div>
+          <div class="macro-item"><div class="macro-val" style="color:var(--blue)">${recipe.protein}g</div><div class="macro-lbl">Protein</div></div>
+          <div class="macro-item"><div class="macro-val">${recipe.carbs}g</div><div class="macro-lbl">Carbs</div></div>
+        </div>
+      </div>
+    </div>`;
+  
+  initSwipe();
+}
+
+function initSwipe() {
+  const card = document.getElementById('currentSwipeCard');
+  if (!card) return;
+  
+  let startX = 0, currentX = 0, isDragging = false;
+  
+  card.addEventListener('touchstart', e => {
+    startX = e.touches[0].clientX;
+    isDragging = true;
+    card.classList.add('dragging');
+  }, { passive: true });
+  
+  card.addEventListener('touchmove', e => {
+    if (!isDragging) return;
+    currentX = e.touches[0].clientX - startX;
+    const rotate = currentX * 0.1;
+    card.style.transform = `translateX(${currentX}px) rotate(${rotate}deg)`;
+  }, { passive: true });
+  
+  card.addEventListener('touchend', () => {
+    isDragging = false;
+    card.classList.remove('dragging');
+    if (currentX > 80) swipeCard('add');
+    else if (currentX < -80) swipeCard('skip');
+    else { card.style.transform = ''; currentX = 0; }
+  });
+}
+
+function swipeCard(action) {
+  const card = document.getElementById('currentSwipeCard');
+  if (!card) return;
+  
+  const recipe = RECIPES[state.swipeIndex % RECIPES.length];
+  const messages = { skip: '⏭ Skipped', save: '🔖 Saved for later', add: `✓ ${recipe.name} added to this week!`, love: `❤️ ${recipe.name} locked into rotation!` };
+  
+  const dir = (action === 'add' || action === 'love') ? 300 : -300;
+  card.style.transition = 'transform 0.3s ease, opacity 0.3s ease';
+  card.style.transform = `translateX(${dir}px) rotate(${dir > 0 ? 15 : -15}deg)`;
+  card.style.opacity = '0';
+  
+  showToast(messages[action]);
+  state.swipeIndex++;
+  saveState();
+  setTimeout(() => renderRecipes(), 350);
+}
+
+// ── REVIEWS ───────────────────────────────────────────────────────────────
+function renderReviews() {
+  const el = document.getElementById('reviewsContent');
+  if (!el) return;
+  el.innerHTML = REVIEWS.map(r => `
+    <div class="review-card">
+      <div class="review-card-header">
+        <div class="review-card-emoji">${r.emoji}</div>
+        <div>
+          <div class="review-card-title">${r.title}</div>
+          <div class="review-card-sub">${r.sub}</div>
+          ${r.rating ? `<div style="margin-top:4px">${r.rating}</div>` : ''}
+          ${r.status === 'reading' ? '<div class="badge badge-green" style="margin-top:4px">Currently reading</div>' : ''}
+          ${r.status === 'queue' ? '<div class="badge badge-amber" style="margin-top:4px">Up next</div>' : ''}
+        </div>
+      </div>
+      <div class="review-card-preview">${r.preview}</div>
+      <div class="review-card-links">
+        ${r.links.map(l => `<div class="review-link" onclick="openLink('${l}','${r.title}')">${l} ↗</div>`).join('')}
+      </div>
+    </div>
+  `).join('');
+}
+
+function switchReviewFilter(filter, el) {
+  document.querySelectorAll('#exploreTab-reviews .chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  // In a real app, filter reviews by type
+  renderReviews();
+}
+
+function openLink(service, title) {
+  showToast(`Opening ${title} in ${service}...`);
+}
+
+function addReview() {
+  showModal('add-review');
+}
+
+// ── PANTRY ────────────────────────────────────────────────────────────────
+function renderPantry() {
+  const el = document.getElementById('pantryContent');
+  if (!el) return;
+  const statusLabels = { ok: 'In stock', low: 'Running low', out: 'Out' };
+  el.innerHTML = PANTRY.map(item => `
+    <div class="pantry-item">
+      <div class="pantry-item-name">${item.name}</div>
+      <div class="pantry-item-status pantry-${item.status}">${statusLabels[item.status]}</div>
+    </div>
+  `).join('');
+}
+
+function addPantryItem() {
+  showModal('add-pantry');
+}
+
+// ── BUSINESS MILESTONES ───────────────────────────────────────────────────
+function renderBusinessMilestones() {
+  const el = document.getElementById('businessMilestones');
+  if (!el) return;
+  el.innerHTML = BUSINESS_MILESTONES.map(m => `
+    <div class="milestone">
+      <div class="milestone-icon" style="background:${m.current ? 'var(--blue-dim)' : m.done ? 'var(--green-dim)' : 'var(--surface3)'}">
+        ${m.done ? '✅' : m.current ? '▶️' : '⏳'}
+      </div>
+      <div class="milestone-content">
+        <div style="font-size:11px;color:var(--text3);font-family:var(--font-mono)">${m.phase}</div>
+        <div class="milestone-title">${m.title}</div>
+        <div class="milestone-sub">${m.tasks.slice(0,2).join(' · ')}${m.tasks.length > 2 ? ` +${m.tasks.length-2} more` : ''}</div>
+        <div class="milestone-status" style="color:${m.current ? 'var(--blue)' : m.done ? 'var(--green)' : 'var(--text3)'}">
+          ${m.current ? 'In progress' : m.done ? 'Complete' : 'Upcoming'}
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+// ── EXPLORE TABS ──────────────────────────────────────────────────────────
+function switchExploreTab(tab, el) {
+  document.querySelectorAll('[id^="exploreTab-"]').forEach(t => t.style.display = 'none');
+  document.getElementById('exploreTab-' + tab).style.display = 'block';
+  document.querySelectorAll('#screen-explore .chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+}
+
+// ── CLOSET ────────────────────────────────────────────────────────────────
+function showOutfitAlt() {
+  showToast('👔 Showing alternative outfit...');
+}
+function useOutfit() {
+  showToast('✅ Outfit confirmed for today. Laid out in night prep checklist.');
+}
+function addClothingItem() {
+  showToast('📸 Camera access needed — will open camera to photograph item');
+}
+
+// ── WEIGHT ────────────────────────────────────────────────────────────────
+function logWeight() {
+  showModal('log-weight');
+}
+
+// ── CHECK-IN ──────────────────────────────────────────────────────────────
+function startCheckin() {
+  navigate('chat');
+  setTimeout(() => {
+    const msg = `🗓️ Sunday Check-In starting! Let's go through it together.\n\n**1. Schedule changes this week?**\nAny work shifts, class cancellations, or new commitments?`;
+    addAIMessage(msg);
+  }, 300);
+}
+
+// ── CHAT ──────────────────────────────────────────────────────────────────
+const SYSTEM_PROMPT = `You are the built-in Claude assistant for a personal Life Operating System app. The user's name is not known but they are:
+- A student with classes Mon-Fri (11am-2pm, Mon 6:30-9:20pm) through May 8 for Thu/Fri
+- Works 15hrs/week: Mon WFH 10am-3pm, Tue online 3-4pm, Wed-Fri in person 2:30-5:30pm
+- President of one club, VP of another (biweekly meetings Tuesdays and Wednesdays)
+- Building a web-service/automation/bot business (concept + planning stage, needs POC)
+- Ex-D1 foil fencer, Team USA, top 20 nationally — returning to fencing in fall
+- Has ADHD and sleep apnea — sleep and habit systems are critical
+- Wants to lose 50-70lbs, on/starting weight loss medication
+- Partner is supportive and knows the full plan
+- Reads Project Hail Mary (current), Magpie Murders (next)
+- Creative outlets: painting, pottery, projects
+- Uses Rocket Money, has Samsung watch
+- 3-week East Asian meal rotation (Japanese/Thai/Chinese-Hawaiian)
+- Located in San Diego, 30 min from campus/work
+- Business blocks: ~17hrs/week in morning windows
+- Goals: POC built, market research done, begin incorporation research, all by June
+- Running accountability system with Claude — flag if patterns contradict goals
+- Key books to read: The Mom Test, Lean Startup, Atomic Habits
+- Week 4 checkpoint is critical — assess pivot vs continue
+
+You help with:
+1. Adjusting weekly schedule around new events
+2. Setting specific business tasks for morning blocks  
+3. Accountability flagging (be honest but kind)
+4. Sunday check-in facilitation
+5. Health/workout guidance
+6. Meal rotation suggestions
+7. General life advice within this plan
+
+Keep responses concise and mobile-friendly. Use bullet points for lists. Be warm, direct, and honest. Flag issues proactively. Always tie back to the user's goals.`;
+
+async function sendMessage() {
+  const input = document.getElementById('chatInput');
+  const text = input.value.trim();
+  if (!text) return;
+  
+  input.value = '';
+  input.style.height = 'auto';
+  addUserMessage(text);
+  
+  state.chatHistory.push({ role: 'user', content: text });
+  
+  // Show typing
+  const typingId = showTyping();
+  
+  try {
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        system: SYSTEM_PROMPT,
+        messages: state.chatHistory.slice(-20), // Keep last 20 messages for context
+      })
+    });
+    
+    removeTyping(typingId);
+    
+    if (!response.ok) throw new Error('API error');
+    
+    const data = await response.json();
+    const reply = data.content[0]?.text || 'Sorry, I had trouble with that. Try again?';
+    
+    addAIMessage(reply);
+    state.chatHistory.push({ role: 'assistant', content: reply });
+    saveState();
+    
+  } catch(err) {
+    removeTyping(typingId);
+    addAIMessage('Connection issue — check your internet and try again. Your message is saved.');
+  }
+}
+
+function addUserMessage(text) {
+  const msgs = document.getElementById('chatMessages');
+  const div = document.createElement('div');
+  div.className = 'msg msg-user';
+  div.textContent = text;
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+function addAIMessage(text) {
+  const msgs = document.getElementById('chatMessages');
+  const div = document.createElement('div');
+  div.className = 'msg msg-ai';
+  // Simple markdown-ish formatting
+  div.innerHTML = text
+    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\*(.*?)\*/g, '<em>$1</em>')
+    .replace(/\n/g, '<br>');
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+function showTyping() {
+  const msgs = document.getElementById('chatMessages');
+  const div = document.createElement('div');
+  div.className = 'msg msg-ai typing-indicator';
+  div.id = 'typing-' + Date.now();
+  div.innerHTML = '<div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div>';
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+  return div.id;
+}
+
+function removeTyping(id) {
+  const el = document.getElementById(id);
+  if (el) el.remove();
+}
+
+function handleChatKey(e) {
+  if (e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault();
+    sendMessage();
+  }
+}
+
+function autoResize(el) {
+  el.style.height = 'auto';
+  el.style.height = Math.min(el.scrollHeight, 120) + 'px';
+}
+
+// ── MODAL ─────────────────────────────────────────────────────────────────
+function showModal(type) {
+  const overlay = document.getElementById('modalOverlay');
+  const content = document.getElementById('modalContent');
+  
+  const modals = {
+    'workout-start': `
+      <div class="modal-title">💪 Start Workout</div>
+      <div class="alert alert-blue" style="margin-bottom:16px">
+        <div class="alert-icon">🧠</div>
+        <div>2-Minute Rule: Just start. Do 2 minutes. If you still want to stop, you can — no judgment.</div>
+      </div>
+      <p style="font-size:14px;color:var(--text2);margin-bottom:16px">Today: Phase 1 · Week 1 · Tuesday Session<br>5 exercises · ~45 min · Home gym</p>
+      <button class="btn btn-primary btn-full" onclick="closeModal();navigate('health')">Let's go 🤺</button>
+    `,
+    'add-review': `
+      <div class="modal-title">Add Review</div>
+      <div class="chip-row" style="margin-bottom:16px">
+        <div class="chip active">📚 Book</div>
+        <div class="chip">🍽️ Restaurant</div>
+        <div class="chip">🎬 Film</div>
+        <div class="chip">📍 Place</div>
+      </div>
+      <input class="input" placeholder="Title..." style="margin-bottom:10px">
+      <textarea class="input" placeholder="Your review or notes..." style="margin-bottom:10px"></textarea>
+      <input class="input" placeholder="Link to Goodreads / Letterboxd / Google Maps..." style="margin-bottom:16px">
+      <button class="btn btn-primary btn-full" onclick="closeModal();showToast('✅ Review added!')">Save</button>
+    `,
+    'log-weight': `
+      <div class="modal-title">⚖️ Log Weight</div>
+      <p style="font-size:13px;color:var(--text2);margin-bottom:16px">Track monthly, not daily. Also log measurements — they often show progress when the scale doesn't.</p>
+      <input class="input" type="number" placeholder="Weight (lbs)..." style="margin-bottom:10px">
+      <input class="input" type="number" placeholder="Waist (inches, optional)..." style="margin-bottom:16px">
+      <button class="btn btn-primary btn-full" onclick="closeModal();showToast('✅ Weight logged!')">Save</button>
+    `,
+    'add-pantry': `
+      <div class="modal-title">🧂 Add Pantry Item</div>
+      <input class="input" placeholder="Item name..." style="margin-bottom:10px">
+      <div class="chip-row" style="margin-bottom:16px">
+        <div class="chip active">✅ In stock</div>
+        <div class="chip">⚠️ Running low</div>
+        <div class="chip">❌ Out</div>
+      </div>
+      <button class="btn btn-primary btn-full" onclick="closeModal();showToast('✅ Item added to pantry!')">Add</button>
+    `,
+    'bug-report': `
+      <div class="modal-title">🐛 Report Issue</div>
+      <p style="font-size:13px;color:var(--text2);margin-bottom:16px">Describe what happened. This goes directly to Claude to log and fix.</p>
+      <textarea class="input" placeholder="What happened? Which screen? What did you expect?..." style="margin-bottom:16px"></textarea>
+      <button class="btn btn-primary btn-full" onclick="submitBugReport()">Send Report</button>
+    `,
+  };
+  
+  content.innerHTML = modals[type] || '<p>Modal content</p>';
+  overlay.classList.add('open');
+}
+
+function closeModal(e) {
+  if (!e || e.target === document.getElementById('modalOverlay')) {
+    document.getElementById('modalOverlay').classList.remove('open');
+  }
+}
+
+// ── BUG REPORT ────────────────────────────────────────────────────────────
+function reportBug() {
+  showModal('bug-report');
+}
+
+function submitBugReport() {
+  closeModal();
+  navigate('chat');
+  setTimeout(() => {
+    addAIMessage('🐛 Bug report received! I\'ll log this and address it in the next update. What screen were you on and what happened?');
+  }, 300);
+}
+
+// ── TOAST ─────────────────────────────────────────────────────────────────
+function showToast(msg) {
+  const existing = document.querySelector('.toast');
+  if (existing) existing.remove();
+  
+  const toast = document.createElement('div');
+  toast.className = 'toast';
+  toast.textContent = msg;
+  toast.style.cssText = `
+    position: fixed; top: 70px; left: 50%; transform: translateX(-50%);
+    background: var(--surface2); border: 1px solid var(--border2);
+    color: var(--text); padding: 10px 20px; border-radius: 20px;
+    font-size: 13px; font-weight: 500; z-index: 300;
+    animation: toastIn 0.25s ease;
+    max-width: 320px; text-align: center;
+  `;
+  document.body.appendChild(toast);
+  setTimeout(() => {
+    toast.style.opacity = '0';
+    toast.style.transition = 'opacity 0.3s';
+    setTimeout(() => toast.remove(), 300);
+  }, 2500);
+}
+
+// ── PWA INSTALL ───────────────────────────────────────────────────────────
+let deferredPrompt;
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+});
+
+// ── START ──────────────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>
