@@ -2,8 +2,8 @@
   "name": "Nomi · Your Mini Me",
   "short_name": "Nomi",
   "description": "A second brain built for ADHD brains. Your Mini Me remembers everything.",
-  "start_url": "/lifeos/",
-  "scope": "/lifeos/",
+  "start_url": "/nomi/",
+  "scope": "/nomi/",
   "display": "standalone",
   "orientation": "portrait-primary",
   "background_color": "#fff5f9",
@@ -16,12 +16,12 @@
   "shortcuts": [
     {
       "name": "Start Focus Timer", "short_name": "Focus",
-      "url": "/lifeos/?shortcut=focus",
+      "url": "/nomi/?shortcut=focus",
       "icons": [{ "src": "icon-192.png", "sizes": "192x192" }]
     },
     {
       "name": "Open Nomi AI", "short_name": "Chat",
-      "url": "/lifeos/?shortcut=chat",
+      "url": "/nomi/?shortcut=chat",
       "icons": [{ "src": "icon-192.png", "sizes": "192x192" }]
     }
   ]
