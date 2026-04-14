@@ -1,13 +1,13 @@
 // Nomi Service Worker — offline cache
 const CACHE_NAME = 'nomi-v1';
-const OFFLINE_URL = '/lifeos/';
+const OFFLINE_URL = '/nomi/';
 
 const CACHE_URLS = [
-  '/lifeos/',
-  '/lifeos/index.html',
-  '/lifeos/manifest.json',
-  '/lifeos/icon-192.png',
-  '/lifeos/icon-512.png',
+  '/nomi/',
+  '/nomi/index.html',
+  '/nomi/manifest.json',
+  '/nomi/icon-192.png',
+  '/nomi/icon-512.png',
 ];
 
 self.addEventListener('install', event => {
